@@ -8,7 +8,7 @@ updates:
   - package-ecosystem: "terraform"
     # Update manifest files stored in these directories weekly
     directories:
-      - "/version1"
+      - "/version1*"
       - "/version2"
       - "/version3"
     schedule:
