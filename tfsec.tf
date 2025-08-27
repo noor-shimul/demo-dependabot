@@ -1,8 +1,8 @@
-nshimul@MMDJQR79K3:~/moj-repos/staff-infrastructure-azure-landing-zone/terraform$ tfsec --force-all-dirs
+# nshimul@MMDJQR79K3:~/moj-repos/staff-infrastructure-azure-landing-zone/terraform$ tfsec --force-all-dirs
 
 Result #1 CRITICAL Vault network ACL does not block access by default.
 ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  environments/dev/100-hub/.terraform/modules/palo_alto_fw/tests/terraform/infra-build/main.tf:38-47
+#  environments/dev/100-hub/.terraform/modules/palo_alto_fw/tests/terraform/infra-build/main.tf:38-47
 ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
    38    resource "azurerm_key_vault" "vm_module_tests" {
    39      name                        = "kv-alz-vm-test-001"
@@ -27,7 +27,7 @@ Result #1 CRITICAL Vault network ACL does not block access by default.
 
 Result #2 CRITICAL Storage account uses an insecure TLS version.
 ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  environments/dev/100-hub/.terraform/modules/palo_alto_fw/tests/terraform/infra-build/main.tf:74-84
+#  environments/dev/100-hub/.terraform/modules/palo_alto_fw/tests/terraform/infra-build/main.tf:74-84
 ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
    74  ┌ resource "azurerm_storage_account" "vm_module_tests" {
    75  │   name                            = "stalzvmtest7272"
