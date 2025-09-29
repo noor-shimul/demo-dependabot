@@ -1,61 +1,28 @@
-name: Renovate Terraform Dependencies
+name: Terraform Dependency Update Summary
 
 on:
   push:
     branches: [ "main" ]
   workflow_dispatch:          # Manual run
-  schedule:
-    - cron: '0 3 * * 1'       # Every Monday at 3 AM UTC
-
+  
 jobs:
-  renovate:
+  summarize-renovate:
+    if: github.actor == 'renovate[bot]'
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      issues: write
 
     steps:
-      - name: Checkout repository
+      - name: Checkout PR branch
         uses: actions/checkout@v4
 
-      - name: Run Renovate
-        id: renovate
-        uses: renovatebot/github-action@v40.1.10
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-        env:
-          LOG_LEVEL: info
-          RENOVATE_LOG_FILE: renovate-log.txt
-
-      # - name: Output Renovate log to GitHub Summary
-      #   if: always()
-      #   run: |
-      #     echo "### 📦 Renovate Log Output" >> $GITHUB_STEP_SUMMARY
-      #     echo "<details><summary>Click to expand</summary>" >> $GITHUB_STEP_SUMMARY
-      #     echo "" >> $GITHUB_STEP_SUMMARY
-      #     echo '```log' >> $GITHUB_STEP_SUMMARY
-      #     tail -n 1000 renovate-log.txt >> $GITHUB_STEP_SUMMARY
-      #     echo '```' >> $GITHUB_STEP_SUMMARY
-      #     echo "</details>" >> $GITHUB_STEP_SUMMARY
-
-      # - name: Prepare PR comment (only in PR context)
-      #   if: github.event_name == 'pull_request'
-      #   run: |
-      #     {
-      #       echo "### 🔄 Renovate Dependency Updates"
-      #       echo "<details><summary>Click to expand</summary>"
-      #       echo ""
-      #       echo '```log'
-      #       tail -n 1000 renovate-log.txt
-      #       echo '```'
-      #       echo "</details>"
-      #     } > renovate-comment.md
-
-      # - name: Post PR comment
-      #   if: github.event_name == 'pull_request'
-      #   uses: peter-evans/create-or-update-comment@v4
-      #   with:
-      #     issue-number: ${{ github.event.pull_request.number }}
-      #     body-file: renovate-comment.md
-      #     comment-identifier: renovate-terraform-summary
+      - name: Extract Terraform changes from PR diff
+        run: |
+          echo "### Terraform Dependency Changes" >> $GITHUB_STEP_SUMMARY
+          git fetch origin main
+          git diff origin/main -- '*.tf' | tee terraform_changes.diff
+          if grep -q "provider" terraform_changes.diff; then
+            echo "\`\`\`diff" >> $GITHUB_STEP_SUMMARY
+            cat terraform_changes.diff >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No provider changes detected." >> $GITHUB_STEP_SUMMARY
+          fi
