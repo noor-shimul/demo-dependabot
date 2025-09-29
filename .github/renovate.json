@@ -1,15 +1,19 @@
 {
   "extends": ["config:base"],
   "enabledManagers": ["terraform"],
+  "terraform": {
+    "enabled": true
+  },
   "packageRules": [
     {
       "managers": ["terraform"],
-      "groupName": "Terraform Providers",
+      "groupName": "All Terraform Providers",
       "matchPackagePatterns": [".*"],
       "enabled": true
     }
   ],
-  "terraform": {
-    "enabled": true
-  }
+  "fileMatch": ["\\.tf$"],
+  "includePaths": ["**/*.tf"],
+  "prHourlyLimit": 20,
+  "prConcurrentLimit": 5
 }
