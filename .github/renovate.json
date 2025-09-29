@@ -1,14 +1,12 @@
 {
-  "extends": [
-    "config:base"
-  ],
-  "labels": ["renovate", "dependencies"],
+  "extends": ["config:base"],
+  "enabledManagers": ["terraform"],
   "packageRules": [
     {
       "managers": ["terraform"],
-      "groupName": "terraform dependencies",
-      "commitMessageTopic": "{{depName}} to {{newVersion}}",
-      "commitMessageExtra": "Updated via Renovate"
+      "groupName": "Terraform Providers",
+      "matchPackagePatterns": [".*"],
+      "enabled": true
     }
   ],
   "terraform": {
