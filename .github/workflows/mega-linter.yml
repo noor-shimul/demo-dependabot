@@ -1,0 +1,9 @@
+name: MegaLinter
+on: [push, pull_request]
+jobs:
+  mega-linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: MegaLinter
+        uses: oxsecurity/megalinter@v7
