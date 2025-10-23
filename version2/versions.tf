@@ -25,4 +25,3 @@ provider "azuread" {
 }
 
 #note
-#not1
