@@ -16,10 +16,7 @@ permissions:
 jobs:
   build:
     name: Terraform Code Analysis using Trivy
-    if: >
-      ${{ github.actor != 'dependabot[bot]' &&
-      (github.event_name != 'pull_request' || github.event.pull_request.user.login != 'dependabot[bot]') &&
-      (github.head_ref == '' || !startsWith(github.head_ref, 'dependabot/')) }}
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-24.04
     steps:
     - name: Checkout
