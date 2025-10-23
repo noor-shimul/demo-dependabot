@@ -4,6 +4,9 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
 version: 2
+permissions:
+  actions: read
+  security-events: write
 updates:
   - package-ecosystem: "terraform"
     # Update manifest files stored in these directories weekly
