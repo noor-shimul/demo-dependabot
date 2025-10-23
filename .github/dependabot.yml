@@ -3,7 +3,7 @@ updates:
   # Enable version updates for npm
   - package-ecosystem: "terraform"
     # Look for `package.json` and `lock` files in the `root` directory
-    directory: "version1/"
+    directory: "version2/"
     # Check the npm registry for updates every day (weekdays)
     schedule:
       interval: "daily"
