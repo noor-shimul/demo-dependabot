@@ -1,0 +1,20 @@
+# MegaLinter configuration for IaC projects
+ENABLE_LINTERS:
+  - TERRAFORM_TFLINT
+  - TERRAFORM_TERRASCAN
+  # - YAML_YAMLLINT
+  # - MARKDOWN_MARKDOWNLINT
+
+FILE_EXTENSIONS:
+  - .tf
+  - .yaml
+  - .yml
+  - .json
+  - .md
+
+EXCLUDED_DIRECTORIES:
+  - .terraform
+
+PRINT_ALPACA: false
+SHOW_ELAPSED_TIME: true
+VALIDATE_ALL_CODEBASE: true
