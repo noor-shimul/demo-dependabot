@@ -42,11 +42,19 @@ jobs:
     - name: Format Trivy Output for PR Comment
       id: trivy_comment
       run: |
-            if grep -q "VULNERABILITY" trivy.txt; then
-              # create detailed comment
-            else
-              echo "✅ No issues found in Trivy scan." > trivy_comment.txt
-            fi
+          if [[ -s trivy.txt ]]; then
+            {
+              echo "### 🔍 Trivy IaC Scan Report"
+              echo "<details><summary>Click to expand</summary>"
+              echo ""
+              echo '```terraform'
+              cat trivy.txt
+              echo '```'
+              echo "</details>"
+            } > trivy_comment.txt
+          else
+            echo "✅ No issues found in Trivy scan." > trivy_comment.txt
+          fi
 
     - name: Comment on PR with Trivy Scan Results
       uses: peter-evans/create-or-update-comment@v5
