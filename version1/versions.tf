@@ -24,4 +24,4 @@ provider "azurerm" {
 provider "azuread" {
 }
 
-#note2
+#note
