@@ -26,13 +26,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run Trivy vulnerability scanner in repo mode
+      - name: Scan for vulnerability and Misconfig in IaC
         uses: aquasecurity/trivy-action@98b26b7b56ad844d1316f2693e06f923686cd4e1 #`v0.2.4`
         id: trivy
         continue-on-error: true
         with:
-          scan-type: 'config'
-          output: 'trivy.txt'
+            scan-type: 'config'
+            severity: 'HIGH,CRITICAL'
+            trivyignores: './.trivyignore'
+            exit-code: '1'  # Fail the job if vulnerabilities are found
+            output: 'trivy.txt'
 
 
       - name: Format Trivy scan result
