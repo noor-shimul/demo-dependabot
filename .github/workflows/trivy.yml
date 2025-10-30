@@ -40,7 +40,8 @@ jobs:
     - name: Format Trivy Output for PR Comment
       id: trivy_comment
       run: |
-        if grep -q "No security findings" trivy.txt && grep -q "Total: 0" trivy.txt; then
+        
+        if grep -qi "no security findings" trivy.txt && grep -qi "0 misconfiguration" trivy.txt; then
           echo "✅ No issues found in Trivy scan." > trivy_comment.txt
         else
           {
