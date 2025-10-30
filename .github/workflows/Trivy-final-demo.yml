@@ -19,7 +19,7 @@ permissions:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  job1:
+  Build:
     name: Build or job-name
     # Skip this job if the PR is created by Dependabot
     if: github.event.pull_request.user.login != 'dependabot[bot]'
@@ -37,10 +37,9 @@ jobs:
         with:
             scan-type: 'config'
             severity: 'HIGH,CRITICAL'
-            trivyignores: './.trivyignore'
+            # trivyignores: './.trivyignore'
             exit-code: '1'  # Fail the job if vulnerabilities are found
             output: 'trivy.txt'
-
 
       - name: Format Trivy Output for PR Comment
         id: trivy_comment
@@ -70,12 +69,3 @@ jobs:
         run: |
             echo "❌ Trivy found Low Medium high or critical issues. Failing the job."
             exit 1
-
-  job2:
-    name: Build or job-name 2
-    # Skip this job if the PR is created by Dependabot
-    if: github.event.pull_request.user.login != 'dependabot[bot]'
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
