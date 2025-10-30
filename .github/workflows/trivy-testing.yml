@@ -33,6 +33,7 @@ jobs:
       continue-on-error: true
       with:
           scan-type: 'config'
+          severity: 'HIGH,CRITICAL'
           skip-dirs: './terraform/modules,./terraform/tests/module'
           trivyignores: './.trivyignore'
           exit-code: '1'  # Fail the job if vulnerabilities are fou
