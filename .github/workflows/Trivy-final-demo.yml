@@ -36,38 +36,25 @@ jobs:
         continue-on-error: true
         with:
             scan-type: 'config'
-            # severity: 'HIGH,CRITICAL'
-            # trivyignores: './.trivyignore'
-            # exit-code: '1'  # Fail the job if vulnerabilities are found
-            output: 'trivy.txt'
+            severity: 'HIGH,CRITICAL'
+            trivyignores: './.trivyignore'
+            format: table
+            exit-code: '1'  # Fail the job if vulnerabilities are found
+            output: 'trivy-output.txt'
 
-      - name: Format Trivy Output for PR Comment
-        id: trivy_comment
+
+      - name: Prepare PR comment
         run: |
-            if [[ -s trivy.txt ]]; then
-              {
-                echo "### 🔍 Trivy IaC Scan Report"
-                echo "<details><summary>Click to expand</summary>"
-                echo ""
-                echo '```terraform'
-                cat trivy.txt
-                echo '```'
-                echo "</details>"
-              } > trivy_comment.txt
-            else
-              echo "✅ No issues found in Trivy scan." > trivy_comment.txt
-            fi
+          if grep -qE 'UNKNOWN|LOW|MEDIUM|HIGH|CRITICAL' trivy-output.txt; then
+            echo "## ⚠️ Trivy Scan Warnings Found" > trivy-comment.md
+            echo "\`\`\`" >> trivy-comment.md
+            cat trivy-output.txt >> trivy-comment.md
+            echo "\`\`\`" >> trivy-comment.md
+          else
+            echo "## ✅ No warnings found in Trivy scan." > trivy-comment.md
+          fi
 
-      # - name: Comment on PR with Trivy Scan Results
-      #   uses: peter-evans/create-or-update-comment@v5
-      #   with:
-      #       issue-number: ${{ github.event.pull_request.number }}
-      #       body-file: trivy_comment.txt
-
-      - name: Fail the job if Trivy finds Misconfiguration or warnings
-        if: steps.trivy.outcome == 'failure'
-        run: |
-            echo "❌ Trivy found Low Medium high or critical issues. Failing the job."
-            exit 1
-
-  # To get the tick box to say no issue is found in the pr comment
+      - name: Comment on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: trivy-comment.md
