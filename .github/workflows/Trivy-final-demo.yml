@@ -58,11 +58,11 @@ jobs:
               echo "✅ No issues found in Trivy scan." > trivy_comment.txt
             fi
 
-      - name: Comment on PR with Trivy Scan Results
-        uses: peter-evans/create-or-update-comment@v5
-        with:
-            issue-number: ${{ github.event.pull_request.number }}
-            body-file: trivy_comment.txt
+      # - name: Comment on PR with Trivy Scan Results
+      #   uses: peter-evans/create-or-update-comment@v5
+      #   with:
+      #       issue-number: ${{ github.event.pull_request.number }}
+      #       body-file: trivy_comment.txt
 
       - name: Fail the job if Trivy finds Misconfiguration or warnings
         if: steps.trivy.outcome == 'failure'
