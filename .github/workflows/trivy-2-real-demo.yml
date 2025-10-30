@@ -1,61 +1,61 @@
-name: Trivy code analysis trivy 2
-# Controls when the workflow will run
-on:
-  # Triggers the workflow on pull request events but only for the "main" branch
-  pull_request:
-    branches: [ "main" ]
-  push:
-    branches: [ "main" ]
+# name: Trivy code analysis trivy 2
+# # Controls when the workflow will run
+# on:
+#   # Triggers the workflow on pull request events but only for the "main" branch
+#   pull_request:
+#     branches: [ "main" ]
+#   push:
+#     branches: [ "main" ]
 
-  # To run workflow manually from the Actions tab
-  workflow_dispatch:
+#   # To run workflow manually from the Actions tab
+#   workflow_dispatch:
 
-permissions:
-  contents: read
-  pull-requests: write
+# permissions:
+#   contents: read
+#   pull-requests: write
 
-# A workflow run is made up of one job multiple steps
-jobs:
-  build:
-    name: Terraform Code Analysis using Trivy
-    # Skip this job if the PR is created by Dependabot
-    if: github.event.pull_request.user.login != 'dependabot[bot]'
-    runs-on: ubuntu-24.04
-    steps:
-    - name: Checkout
-      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      env:
-        token: ${{ env.ACCESS_TOKEN }}
+# # A workflow run is made up of one job multiple steps
+# jobs:
+#   build:
+#     name: Terraform Code Analysis using Trivy
+#     # Skip this job if the PR is created by Dependabot
+#     if: github.event.pull_request.user.login != 'dependabot[bot]'
+#     runs-on: ubuntu-24.04
+#     steps:
+#     - name: Checkout
+#       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+#       env:
+#         token: ${{ env.ACCESS_TOKEN }}
 
-    - name: Scan for vulnerability and Misconfig in IaC
-      uses: aquasecurity/trivy-action@98b26b7b56ad844d1316f2693e06f923686cd4e1 #`v0.2.4`
-      id: trivy
-      continue-on-error: true
-      with:
-          scan-type: 'config'
-          skip-dirs: './terraform/modules,./terraform/tests/module'
-          exit-code: '1'  # Fail the job if vulnerabilities are fou
-          output: 'trivy.txt'
+#     - name: Scan for vulnerability and Misconfig in IaC
+#       uses: aquasecurity/trivy-action@98b26b7b56ad844d1316f2693e06f923686cd4e1 #`v0.2.4`
+#       id: trivy
+#       continue-on-error: true
+#       with:
+#           scan-type: 'config'
+#           skip-dirs: './terraform/modules,./terraform/tests/module'
+#           exit-code: '1'  # Fail the job if vulnerabilities are fou
+#           output: 'trivy.txt'
           
-    - name: Format Trivy Output for PR Comment
-      id: trivy_comment
-      run: |
-          if [[ -s trivy.txt ]]; then
-            {
-              echo "### 🔍 Trivy IaC Scan Report"
-              echo "<details><summary>Click to expand</summary>"
-              echo ""
-              echo '```terraform'
-              cat trivy.txt
-              echo '```'
-              echo "</details>"
-            } > trivy_comment.txt
-          else
-            echo "✅ No issues found in Trivy scan." > trivy_comment.txt
-          fi
+#     - name: Format Trivy Output for PR Comment
+#       id: trivy_comment
+#       run: |
+#           if [[ -s trivy.txt ]]; then
+#             {
+#               echo "### 🔍 Trivy IaC Scan Report"
+#               echo "<details><summary>Click to expand</summary>"
+#               echo ""
+#               echo '```terraform'
+#               cat trivy.txt
+#               echo '```'
+#               echo "</details>"
+#             } > trivy_comment.txt
+#           else
+#             echo "✅ No issues found in Trivy scan." > trivy_comment.txt
+#           fi
 
-    - name: Comment on PR with Trivy Scan Results
-      uses: peter-evans/create-or-update-comment@v5
-      with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body-file: trivy_comment.txt
+#     - name: Comment on PR with Trivy Scan Results
+#       uses: peter-evans/create-or-update-comment@v5
+#       with:
+#           issue-number: ${{ github.event.pull_request.number }}
+#           body-file: trivy_comment.txt
