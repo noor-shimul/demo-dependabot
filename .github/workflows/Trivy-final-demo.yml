@@ -45,10 +45,6 @@ jobs:
           else
             echo "## ✅ No vulnerabilities found." > formatted-trivy-result.md
           fi
-      - name: Comment on PR with Trivy scan results
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          path: formatted-trivy-result.md
 
       - name: Fail if Trivy found high/critical issues
         if: steps.trivy.outcome == 'failure'
