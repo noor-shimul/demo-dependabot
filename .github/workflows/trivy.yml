@@ -1,4 +1,4 @@
-name: Trivy code analysis trivy 2 real demo
+name: Trivy code analysis testing
 # Controls when the workflow will run
 on:
   # Triggers the workflow on pull request events but only for the "main" branch
@@ -35,26 +35,18 @@ jobs:
           scan-type: 'config'
           severity: 'HIGH,CRITICAL'
           skip-dirs: './terraform/modules,./terraform/tests/module'
-          trivyignores: './.trivyignore'
+          trivyignores: './.trivyignore.yaml'
           exit-code: '1'  # Fail the job if vulnerabilities are fou
           output: 'trivy.txt'
           
     - name: Format Trivy Output for PR Comment
       id: trivy_comment
       run: |
-          if [[ -s trivy.txt ]]; then
-            {
-              echo "### 🔍 Trivy IaC Scan Report"
-              echo "<details><summary>Click to expand</summary>"
-              echo ""
-              echo '```terraform'
-              cat trivy.txt
-              echo '```'
-              echo "</details>"
-            } > trivy_comment.txt
-          else
-            echo "✅ No issues found in Trivy scan." > trivy_comment.txt
-          fi
+            if grep -q "VULNERABILITY" trivy.txt; then
+              # create detailed comment
+            else
+              echo "✅ No issues found in Trivy scan." > trivy_comment.txt
+            fi
 
     - name: Comment on PR with Trivy Scan Results
       uses: peter-evans/create-or-update-comment@v5
@@ -67,14 +59,3 @@ jobs:
       run: |
           echo "❌ Trivy found high or critical issues. Failing the job."
           exit 1
-
-    - name: Prepare PR comment
-      run: |
-        if grep -qE 'UNKNOWN|LOW|MEDIUM|HIGH|CRITICAL' trivy.txt; then
-          echo "## ⚠️ Trivy Scan Warnings Found" > trivy-comment.md
-          echo "\`\`\`" >> trivy-comment.md
-          cat trivy-output.txt >> trivy-comment.md
-          echo "\`\`\`" >> trivy-comment.md
-        else
-          echo "## ✅ No failures or warnings found in Trivy scan." > trivy-comment.md
-        fi

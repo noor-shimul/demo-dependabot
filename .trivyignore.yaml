@@ -1,0 +1,5 @@
+misconfigurations:
+- id: AVD-AZU-0013
+- id: AVD-AZU-0015
+- id: AVD-AZU-0016
+- id: AVD-AZU-0017
