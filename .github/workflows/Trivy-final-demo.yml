@@ -72,3 +72,10 @@ jobs:
             exit 1
 
   job2:
+    name: Build or job-name 2
+    # Skip this job if the PR is created by Dependabot
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
