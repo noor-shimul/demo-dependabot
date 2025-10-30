@@ -38,7 +38,17 @@ jobs:
           trivyignores: './.trivyignore.yaml'
           exit-code: '1'  # Fail the job if vulnerabilities are fou
           output: 'trivy.txt'
-          
+     
+    
+    - name: Format Trivy Scan Result
+      run: |
+          if [ -s trivy-result.txt ]; then
+            echo -e "## 🔍 Trivy Vulnerability Scan\n<details><summary>Click to expand</summary>\n\n\`\`\`\n$(cat trivy-result.txt)\n\`\`\`\n</details>" > formatted-trivy-result.md
+          else
+            echo -e "## ✅ Trivy Scan\nNo vulnerabilities found." > formatted-trivy-result.md
+          fi
+
+
     - name: Format Trivy Output for PR Comment
       id: trivy_comment
       run: |
