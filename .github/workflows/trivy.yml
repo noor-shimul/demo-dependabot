@@ -42,7 +42,7 @@ jobs:
       run: |
           if [[ -s trivy.txt ]] && grep -qi "Misconfigurations │[[:space:]]*0" trivy.txt; then
             echo "✅ No issues found in Trivy scan." > trivy_comment.txt
-            
+
           else
             {
               echo "### 🔍 Trivy IaC Scan Report"
@@ -53,8 +53,6 @@ jobs:
               echo '```'
               echo "</details>"
             } > trivy_comment.txt
-          else
-            echo "✅ No issues found in Trivy scan." > trivy_comment.txt
           fi
 
     - name: Comment on PR with Trivy Scan Results
