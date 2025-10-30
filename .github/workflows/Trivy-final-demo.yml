@@ -70,3 +70,5 @@ jobs:
         run: |
             echo "❌ Trivy found Low Medium high or critical issues. Failing the job."
             exit 1
+
+  job2:
