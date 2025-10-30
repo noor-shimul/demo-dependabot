@@ -19,12 +19,16 @@ permissions:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build:
-    name: Build
+  job1:
+    name: Build or job-name
+    # Skip this job if the PR is created by Dependabot
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        # env:
+        #   token: ${{ env.ACCESS_TOKEN }} 
 
       - name: Scan for vulnerability and Misconfig in IaC
         uses: aquasecurity/trivy-action@98b26b7b56ad844d1316f2693e06f923686cd4e1 #`v0.2.4`
