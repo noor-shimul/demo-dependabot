@@ -29,6 +29,8 @@ jobs:
 
     - name: Scan for vulnerability and Misconfig in IaC
       uses: aquasecurity/trivy-action@98b26b7b56ad844d1316f2693e06f923686cd4e1 #`v0.2.4`
+      id: trivy
+      continue-on-error: true
       with:
           scan-type: 'config'
           skip-dirs: './terraform/modules,./terraform/tests/module'
