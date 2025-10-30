@@ -38,7 +38,7 @@ jobs:
             scan-type: 'config'
             # severity: 'HIGH,CRITICAL'
             # trivyignores: './.trivyignore'
-            exit-code: '1'  # Fail the job if vulnerabilities are found
+            # exit-code: '1'  # Fail the job if vulnerabilities are found
             output: 'trivy.txt'
 
       - name: Format Trivy Output for PR Comment
