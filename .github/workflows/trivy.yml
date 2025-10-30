@@ -36,17 +36,31 @@ jobs:
           severity: 'HIGH,CRITICAL'
           skip-dirs: './terraform/modules,./terraform/tests/module'
           trivyignores: './.trivyignore'
-          exit-code: '1'  # Fail the job if vulnerabilities are fou
+          exit-code: '1'  # Fail the job if vulnerabilities are found
           output: 'trivy.txt'
      
-    
-    - name: Format Trivy Scan Result
+
+    - name: Run Trivy IaC scan
+      id: trivy1
       run: |
-          if [ -s trivy-result.txt ]; then
-            echo -e "## 🔍 Trivy Vulnerability Scan\n<details><summary>Click to expand</summary>\n\n\`\`\`\n$(cat trivy-result.txt)\n\`\`\`\n</details>" > formatted-trivy-result.md
-          else
-            echo -e "## ✅ Trivy Scan\nNo vulnerabilities found." > formatted-trivy-result.md
-          fi
+        trivy config . --exit-code 1 --format table > trivy.txt
+        echo "TRIVY_EXIT_CODE=$?" >> $GITHUB_ENV
+    - name: Prepare Trivy comment
+      run: |
+        if [ "$TRIVY_EXIT_CODE" -eq 1 ]; then
+          {
+            echo "### 🔍 Trivy IaC Scan Report"
+            echo "<details><summary>Click to expand</summary>"
+            echo ""
+            echo '```'
+            cat trivy.txt
+            echo '```'
+            echo "</details>"
+          } > trivy_comment.txt
+        else
+          echo "✅ No issues found in Trivy scan." > trivy_comment.txt
+        fi
+
 
 
     - name: Format Trivy Output for PR Comment
