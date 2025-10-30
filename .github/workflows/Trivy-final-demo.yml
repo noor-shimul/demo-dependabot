@@ -45,6 +45,12 @@ jobs:
           else
             echo "## ✅ No vulnerabilities found." > formatted-trivy-result.md
           fi
+          
+      - name: Comment on PR with Trivy Scan Results
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+            issue-number: ${{ github.event.pull_request.number }}
+            body-file: trivy_comment.txt
 
       - name: Fail if Trivy found high/critical issues
         if: steps.trivy.outcome == 'failure'
