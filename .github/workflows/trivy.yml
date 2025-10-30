@@ -66,3 +66,42 @@ jobs:
       run: |
           echo "❌ Trivy found Low Medium high or critical issues. Failing the job."
           exit 1
+
+
+
+  build2:
+    name: Terraform Code Analysis using Trivy2
+    # Skip this job if the PR is created by Dependabot
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      env:
+        token: ${{ env.ACCESS_TOKEN }}
+    - name: Run Trivy IaC scan
+      id: trivy
+      run: |
+        trivy config . --exit-code 1 --format table > trivy.txt
+        echo "TRIVY_EXIT_CODE=$?" >> $GITHUB_ENV
+
+    - name: Prepare Trivy comment
+      run: |
+        if [ "$TRIVY_EXIT_CODE" -eq 0 ] && grep -qi "Misconfigurations │[[:space:]]*0" trivy.txt; then
+          echo "✅ No issues found in Trivy scan." > trivy_comment.txt
+        else
+          {
+            echo "### 🔍 Trivy IaC Scan Report"
+            echo "<details><summary>Click to expand</summary>"
+            echo ""
+            echo '```'
+            cat trivy.txt
+            echo '```'
+            echo "</details>"
+          } > trivy_comment.txt
+        fi
+
+          - name: Comment on PR
+            uses: marocchino/sticky-pull-request-comment@v2
+            with:
+              path: trivy_comment.txt
