@@ -66,10 +66,10 @@ jobs:
       run: |
           echo "❌ Trivy found high or critical issues. Failing the job."
           exit 1
-          
+
     - name: Prepare PR comment
       run: |
-        if grep -qE 'UNKNOWN|LOW|MEDIUM|HIGH|CRITICAL' trivy-output.txt; then
+        if grep -qE 'UNKNOWN|LOW|MEDIUM|HIGH|CRITICAL' trivy.txt; then
           echo "## ⚠️ Trivy Scan Warnings Found" > trivy-comment.md
           echo "\`\`\`" >> trivy-comment.md
           cat trivy-output.txt >> trivy-comment.md
