@@ -35,7 +35,7 @@ jobs:
           scan-type: 'config'
           severity: 'HIGH,CRITICAL'
           skip-dirs: './terraform/modules,./terraform/tests/module'
-          trivyignores: './.trivyignore.yaml'
+          trivyignores: './.trivyignore'
           exit-code: '1'  # Fail the job if vulnerabilities are fou
           output: 'trivy.txt'
      
