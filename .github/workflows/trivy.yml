@@ -33,14 +33,18 @@ jobs:
           scan-type: 'config'
           severity: 'HIGH,CRITICAL'
           skip-dirs: './terraform/modules,./terraform/tests/module'
-          trivyignores: '../../.trivyignore'
+          trivyignores: './.trivyignore'
           exit-code: '1'  # Fail the job if vulnerabilities are found
           output: 'trivy.txt'
           
     - name: Format Trivy Output for PR Comment
       id: trivy_comment
       run: |
-          if [[ -s trivy.txt ]]; then
+          if [[ -s trivy.txt eq 0 ]]; then
+          
+            echo "✅ No issues found in Trivy scan." > trivy_comment.txt
+                      else
+
             {
               echo "### 🔍 Trivy IaC Scan Report"
               echo "<details><summary>Click to expand</summary>"
