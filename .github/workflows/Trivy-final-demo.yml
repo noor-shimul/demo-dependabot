@@ -50,7 +50,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v5
         with:
             issue-number: ${{ github.event.pull_request.number }}
-            body-file: trivy_comment.txt
+            body-file: formatted-trivy-result.md
 
       - name: Fail if Trivy found high/critical issues
         if: steps.trivy.outcome == 'failure'
