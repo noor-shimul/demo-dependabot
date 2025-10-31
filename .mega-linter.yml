@@ -1,0 +1,21 @@
+
+# Enable only Terraform linter
+ENABLE_LINTERS:
+  - TERRAFORM_TFLINT
+# Optional: Customize Terraform linter behavior
+TERRAFORM_TFLINT_CONFIG_FILE: .tflint.hcl
+
+# Include only Terraform files
+FILTER_REGEX_INCLUDE: .*\.tf$
+
+# Exclude directories if needed
+EXCLUDED_DIRECTORIES:
+  #- .github
+
+# Reporting options
+REPORTERS:
+  - markdown
+  - json
+  - sarif
+# Optional: Disable errors to avoid failing the pipeline
+DISABLE_ERRORS: false
