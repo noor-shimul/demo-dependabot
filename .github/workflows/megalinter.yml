@@ -1,7 +1,7 @@
 # Create a file at .github/workflows/mega-linter.yml in your repository with the following content:
 
 
-name: MegaLinter
+name: MegaLinter test
 
 on:
   push:
@@ -14,7 +14,7 @@ env:
 
 jobs:
   megalinter:
-    name: MegaLinter
+    name: MegaLinter job name
     runs-on: ubuntu-latest
     permissions:
       contents: write
