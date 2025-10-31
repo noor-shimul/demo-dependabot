@@ -11,7 +11,7 @@
 # Enable only Terraform linter
 ENABLE_LINTERS:
   - TERRAFORM_TFLINT
-  - REPOSITORY_TRIVY
+  - REPOSITORY_TRIVY_CONFIG_FILE
 
 # Optional: Customize Terraform linter behavior
 TERRAFORM_TFLINT_CONFIG_FILE: .tflint.hcl
