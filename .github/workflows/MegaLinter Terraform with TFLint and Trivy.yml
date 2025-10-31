@@ -1,0 +1,35 @@
+# name: MegaLinter Terraform with TFLint and Trivy
+
+# on:
+#   # push:
+#   #   branches: [main]
+#   pull_request:
+#     branches: [main]
+
+# jobs:
+#   mega-linter:
+#     name: MegaLinter - Terraform with TFLint and Trivy
+#     runs-on: ubuntu-latest
+
+#     env:
+#       MEGALINTER_FLAVOR: terraform
+#       DISABLE_LINTERS: ALL
+#       ENABLE_LINTERS: |
+#         TERRAFORM_TFLINT
+#         REPOSITORY_TRIVY
+#       FILTER_REGEX_INCLUDE: '.*\\.tf$'
+#       REPOSITORY_TRIVY_FILE_EXTENSIONS: 'tf'
+#       REPOSITORY_TRIVY_ARGUMENTS: >
+#         config
+#         --scanners config,secret
+#         --severity HIGH,CRITICAL,Medium,Low
+#         --format table
+#         --exit-code 1
+#         --skip-dirs .terraform
+
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
+
+#       - name: MegaLinter
+#         uses: oxsecurity/megalinter@v7

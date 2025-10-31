@@ -30,4 +30,4 @@ jobs:
         id: ml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MEGALINTER_FLAVOR: terraform
+          ENABLE_LINTERS: TERRAFORM_TFLINT
