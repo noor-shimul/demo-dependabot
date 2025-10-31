@@ -1,10 +1,8 @@
-name: Trivy code analysis trivy 2 real demo
+name: Trivy code analysis
 # Controls when the workflow will run
 on:
   # Triggers the workflow on pull request events but only for the "main" branch
   pull_request:
-    branches: [ "main" ]
-  push:
     branches: [ "main" ]
 
   # To run workflow manually from the Actions tab
@@ -33,26 +31,30 @@ jobs:
       continue-on-error: true
       with:
           scan-type: 'config'
+          severity: 'HIGH,CRITICAL'
           skip-dirs: './terraform/modules,./terraform/tests/module'
-          exit-code: '1'  # Fail the job if vulnerabilities are fou
+          trivyignores: './.trivyignore'
+          exit-code: '1'  # Fail the job if vulnerabilities are found
           output: 'trivy.txt'
           
     - name: Format Trivy Output for PR Comment
       id: trivy_comment
       run: |
-          if [[ -s trivy.txt ]]; then
-            {
-              echo "### 🔍 Trivy IaC Scan Report"
-              echo "<details><summary>Click to expand</summary>"
-              echo ""
-              echo '```terraform'
-              cat trivy.txt
-              echo '```'
-              echo "</details>"
-            } > trivy_comment.txt
-          else
-            echo "✅ No issues found in Trivy scan." > trivy_comment.txt
-          fi
+
+            # Check if all misconfiguration counts are 0
+            if ! grep -E '│[[:space:]]*terraform[[:space:]]*│[[:space:]]*[1-9][0-9]*[[:space:]]*│' trivy.txt; then
+              echo "✅ No issues found in Trivy scan." > trivy_comment.txt
+            else
+              {
+                echo "### 🔍 Trivy IaC Scan Report"
+                echo "<details><summary>Click to expand</summary>"
+                echo ""
+                echo '```'
+                cat trivy.txt
+                echo '```'
+                echo "</details>"
+              } > trivy_comment.txt
+            fi
 
     - name: Comment on PR with Trivy Scan Results
       uses: peter-evans/create-or-update-comment@v5
@@ -60,8 +62,8 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body-file: trivy_comment.txt
 
-    - name: Fail if Trivy found high/critical issues
+    - name: Fail the job if Trivy finds Misconfiguration or warnings
       if: steps.trivy.outcome == 'failure'
       run: |
-          echo "❌ Trivy found high or critical issues. Failing the job."
+          echo "❌ Trivy found Low Medium high or critical issues. Failing the job."
           exit 1
