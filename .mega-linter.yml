@@ -48,7 +48,7 @@ FLAVOR_SUGGESTIONS: false # creates more noise in the pr comment with additional
 #Only report high and critical issues
 #Use a custom config file if needed
 
-REPOSITORY_TRIVY_CONFIG_FILE: trivy.yaml
+#REPOSITORY_TRIVY_CONFIG_FILE: trivy.yaml
 # REPOSITORY_TRIVY_ARGUMENTS: "--severity HIGH,CRITICAL --ignore-unfixed"
 # REPOSITORY_TRIVY_ARGUMENTS: "--scanners vuln,misconfig,secret --severity HIGH,CRITICAL"
 REPOSITORY_TRIVY_DISABLE_ERRORS: false
@@ -61,13 +61,13 @@ FILTER_REGEX_INCLUDE: ".*\\.tf$"
 
 
 # Use REPOSITORY_TRIVY_ARGUMENTS to pass custom flags to Trivy. For Terraform, use the config scan type and specify severity levels, output format, and scanners:
-# REPOSITORY_TRIVY_ARGUMENTS: >
-#   config
-#   --scanners config,secret
-#   --severity HIGH,CRITICAL
-#   --format table
-#   --exit-code 1
-#   --skip-dirs .terraform
+REPOSITORY_TRIVY_ARGUMENTS: >
+  config
+  --scanners config,secret
+  --severity HIGH,CRITICAL,MEDIUM,LOW
+  --format table
+  --exit-code 1
+  --skip-dirs .terraform
 
 # You can also specify a custom Trivy config file:
 # REPOSITORY_TRIVY_CONFIG_FILE: "trivy.yaml"
