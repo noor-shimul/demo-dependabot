@@ -1,8 +1,8 @@
 
-config {
-  deep_check = true
-  ignore_module = false
-}
+# config {
+#   deep_check = true
+#   ignore_module = false
+# }
 
 
 
