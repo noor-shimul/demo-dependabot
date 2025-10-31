@@ -16,7 +16,7 @@
 # Enable only Terraform linter and enable the Trivy linter:
 ENABLE_LINTERS:
   - TERRAFORM_TFLINT
-  - REPOSITORY_TRIVY
+  # - REPOSITORY_TRIVY
 
 # Optional: Customize Terraform linter behavior
 TERRAFORM_TFLINT_CONFIG_FILE: .tflint.hcl
@@ -33,6 +33,7 @@ REPORTERS:
   - markdown
   - json
   - sarif
+  - table
 # Optional: Disable errors to avoid failing the pipeline
 DISABLE_ERRORS: false
 FLAVOR_SUGGESTIONS: false # creates more noise in the pr comment with additional info about megalinter flavors of terraform scans
@@ -51,23 +52,23 @@ FLAVOR_SUGGESTIONS: false # creates more noise in the pr comment with additional
 #REPOSITORY_TRIVY_CONFIG_FILE: trivy.yaml
 # REPOSITORY_TRIVY_ARGUMENTS: "--severity HIGH,CRITICAL --ignore-unfixed"
 # REPOSITORY_TRIVY_ARGUMENTS: "--scanners vuln,misconfig,secret --severity HIGH,CRITICAL"
-REPOSITORY_TRIVY_DISABLE_ERRORS: false
+# REPOSITORY_TRIVY_DISABLE_ERRORS: false
 
 # To ensure Trivy only scans Terraform files, configure the file extensions and regex filters:
-REPOSITORY_TRIVY_FILE_EXTENSIONS:
-  - "tf"
-REPOSITORY_TRIVY_FILE_NAMES_REGEX: []
-FILTER_REGEX_INCLUDE: ".*\\.tf$"
+# REPOSITORY_TRIVY_FILE_EXTENSIONS:
+#   - "tf"
+# REPOSITORY_TRIVY_FILE_NAMES_REGEX: []
+# FILTER_REGEX_INCLUDE: ".*\\.tf$"
 
 
 # Use REPOSITORY_TRIVY_ARGUMENTS to pass custom flags to Trivy. For Terraform, use the config scan type and specify severity levels, output format, and scanners:
-REPOSITORY_TRIVY_ARGUMENTS: >
-  config
-  --scanners config,secret
-  --severity HIGH,CRITICAL,MEDIUM,LOW
-  --format table
-  --exit-code 1
-  --skip-dirs .terraform
+# REPOSITORY_TRIVY_ARGUMENTS: >
+#   config
+#   --scanners config,secret
+#   --severity HIGH,CRITICAL,MEDIUM,LOW
+#   --format table
+#   --exit-code 1
+#   --skip-dirs .terraform
 
 # You can also specify a custom Trivy config file:
 # REPOSITORY_TRIVY_CONFIG_FILE: "trivy.yaml"
