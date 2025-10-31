@@ -8,10 +8,15 @@
 # 
 
 
-# Enable only Terraform linter
+
+# .mega-linter.yml
+# extends: default # means that your configuration inherits the default MegaLinter settings.
+
+
+# Enable only Terraform linter and enable the Trivy linter:
 ENABLE_LINTERS:
   - TERRAFORM_TFLINT
-  - REPOSITORY_TRIVY_CONFIG_FILE
+  - REPOSITORY_TRIVY
 
 # Optional: Customize Terraform linter behavior
 TERRAFORM_TFLINT_CONFIG_FILE: .tflint.hcl
@@ -31,3 +36,68 @@ REPORTERS:
 # Optional: Disable errors to avoid failing the pipeline
 DISABLE_ERRORS: false
 FLAVOR_SUGGESTIONS: false # creates more noise in the pr comment with additional info about megalinter flavors of terraform scans
+
+
+
+
+
+#######################-------------------#######################
+# Test trivy below
+#This config tells MegaLinter to:
+#Run Trivy with vulnerability, misconfiguration, and secret detection
+#Only report high and critical issues
+#Use a custom config file if needed
+
+REPOSITORY_TRIVY_CONFIG_FILE: trivy.yaml
+# REPOSITORY_TRIVY_ARGUMENTS: "--severity HIGH,CRITICAL --ignore-unfixed"
+# REPOSITORY_TRIVY_ARGUMENTS: "--scanners vuln,misconfig,secret --severity HIGH,CRITICAL"
+REPOSITORY_TRIVY_DISABLE_ERRORS: false
+
+# To ensure Trivy only scans Terraform files, configure the file extensions and regex filters:
+REPOSITORY_TRIVY_FILE_EXTENSIONS:
+  - "tf"
+REPOSITORY_TRIVY_FILE_NAMES_REGEX: []
+FILTER_REGEX_INCLUDE: ".*\\.tf$"
+
+
+# Use REPOSITORY_TRIVY_ARGUMENTS to pass custom flags to Trivy. For Terraform, use the config scan type and specify severity levels, output format, and scanners:
+# REPOSITORY_TRIVY_ARGUMENTS: >
+#   config
+#   --scanners config,secret
+#   --severity HIGH,CRITICAL
+#   --format table
+#   --exit-code 1
+#   --skip-dirs .terraform
+
+# You can also specify a custom Trivy config file:
+# REPOSITORY_TRIVY_CONFIG_FILE: "trivy.yaml"
+
+
+# Create a trivy.yaml Config File
+# This file allows more granular control over Trivy’s behavior:
+
+# timeout: 5m0s
+# exit-code: 1
+# format: "table"
+# output: "./trivy-report.txt"
+# report: "all"
+# misconfiguration:
+#   scanners:
+#     - terraform
+# terraform:
+#   vars:
+#     - "./terraform/dev.tfvars"
+#     - "./terraform/common.tfvars"
+# scan:
+#   scanners:
+#     - secret
+#     - misconfig
+
+
+# Other Linters
+# To avoid scanning non-Terraform files, disable unrelated linters:
+
+# DISABLE_LINTERS:
+#   - ALL
+# ENABLE_LINTERS:
+#   - REPOSITORY_TRIVY
