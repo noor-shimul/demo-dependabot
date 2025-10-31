@@ -4,7 +4,6 @@
 name: MegaLinter test
 
 on:
-  push:
   pull_request:
     branches: [main]
 
@@ -32,3 +31,4 @@ jobs:
         id: ml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MEGALINTER_FLAVOR: terraform

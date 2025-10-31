@@ -1,7 +1,18 @@
 
+# The default Terraform flavor includes linters like:
+# 
+# TERRAFORM_TFLINT
+# TERRAFORM_TERRASCAN
+# TERRAFORM_TERRAGRUNT
+# TERRAFORM_TERRAFORM_FMT
+# 
+
+
 # Enable only Terraform linter
 ENABLE_LINTERS:
   - TERRAFORM_TFLINT
+  - TERRAFORM_TERRAFORM_FMT
+
 # Optional: Customize Terraform linter behavior
 TERRAFORM_TFLINT_CONFIG_FILE: .tflint.hcl
 
