@@ -26,8 +26,7 @@ jobs:
           fetch-depth: 0
 
       - name: MegaLinter
-        uses: oxsecurity/megalinter@v9 --custom-flavor-setup --custom-flavor-linters TERRAFORM_TFLINT
+        uses: oxsecurity/megalinter@v9
         id: ml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MEGALINTER_FLAVOR: terraform
