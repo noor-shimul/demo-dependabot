@@ -1,9 +1,34 @@
 version: 2
 updates:
-  # Enable version updates for npm
   - package-ecosystem: "terraform"
-    # Look for `package.json` and `lock` files in the `root` directory
-    directory: "version3/"
-    # Check the npm registry for updates every day (weekdays)
+    directories:
+      - "/version1"
+      - "/version1/version1.1"
+      - "/version1/version1.2"
     schedule:
       interval: "daily"
+    groups:
+      terraform-version-updates:
+        patterns:
+          - "terraform"
+      azure-providers:
+        patterns:
+          - "azurerm"
+          - "azuread"
+          - "azapi"
+    open-pull-requests-limit: 5
+
+
+
+#Current config
+# version: 2
+# updates:
+#   # Enable version updates for npm
+#   - package-ecosystem: "terraform"
+#     # Look for `package.json` and `lock` files in the `root` directory
+#     directory: "version3/"
+#     # Check the npm registry for updates every day (weekdays)
+#     schedule:
+#       interval: "daily"
+
+
