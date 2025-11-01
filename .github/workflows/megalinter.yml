@@ -29,6 +29,5 @@ jobs:
         uses: oxsecurity/megalinter@v9.1.0
         id: ml
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENABLE_LINTERS: TERRAFORM_TFLINT
           FLAVOR_SUGGESTIONS: false
