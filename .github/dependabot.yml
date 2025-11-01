@@ -2,9 +2,9 @@ version: 2
 updates:
   - package-ecosystem: "terraform"
     directories:
-      - /version1
-      - /version1/version1.1
-      - /version1/version1.2
+      - "/version1"
+      - "/version1/version1.1"
+      - "/version1/version1.2"
     schedule:
       interval: "daily"
     groups:
