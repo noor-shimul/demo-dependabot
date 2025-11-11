@@ -1,55 +1,27 @@
 {
-    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": [
-        "config:recommended",
-        // "schedule:earlyMondays",
-        // "docker:pinDigests",
-        // "helpers:pinGitHubActionDigests",
-        // ":configMigration",
-        // ":pinDevDependencies"
-    ],
-    "branchPrefix": "renovate-",
-    "commitMessageAction": "Renovate Update",
-    "labels": [
-        "Dependencies",
-        "Renovate"
-    ],
-    "prConcurrentLimit": 0,
-    "branchConcurrentLimit": 0,
-    "separateMultipleMajor": true,
-    "lockFileMaintenance": {
-        "enabled": false
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "enabledManagers": ["terraform"],
+  "dependencyDashboard": true,
+  "packageRules": [
+    {
+      "matchManagers": ["terraform"],
+      "matchDepNames": ["azurerm", "azuread"],
+      "groupName": "Azure Terraform Providers",
+      "groupSlug": "azure-providers",
+      "matchDatasources": ["terraform-provider"],
+      "matchFilePatterns": ["**/*.tf"]
     },
-    "packageRules": [
-        {
-            "groupName": "Patch & Minor Updates",
-            "groupSlug": "all-minor-patch-updates",
-            "labels": [
-                "Dependencies",
-                "Renovate"
-            ],
-            "matchUpdateTypes": [
-                "minor",
-                "patch"
-            ],
-            "prCreation": "immediate",
-            "prPriority": 5,
-            "minimumReleaseAge": "3 days",
-            "matchPackageNames": [
-                "*"
-            ]
-        }
-    ],
-    "major": {
-        "automerge": false,
-        "labels": [
-            "Dependencies",
-            "Renovate"
-        ],
-        "prCreation": "immediate",
-        "minimumReleaseAge": "3 days"
-    },
-    "vulnerabilityAlerts": {
-        "enabled": true
+    {
+      "matchManagers": ["terraform"],
+      "matchDatasources": ["terraform-provider", "terraform-module"],
+      "additionalBranchPrefix": "{{baseDir}}-",
+      "matchFilePatterns": ["**/terraform/**"]
     }
+  ],
+  "terraform": {
+    "enabled": true,
+    "fileMatch": ["**/*.tf"]
+  }
 }
+
