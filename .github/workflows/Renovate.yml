@@ -1,0 +1,21 @@
+name: Renovate
+
+permissions:
+  contents: read
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs daily at midnight
+  workflow_dispatch:     # Allows manual triggering
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Renovate
+        uses: renovatebot/github-action@v42.0.1
+        with:
+          configurationFile: renovate-config.js
