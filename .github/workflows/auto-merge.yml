@@ -1,0 +1,36 @@
+name: Auto-approve and squash merge Dependabot PRs
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - name: Check if PR has no changes
+        run: |
+          if [ "$(jq -r '.pull_request.changed_files' $GITHUB_EVENT_PATH)" -eq 0 ]; then
+            echo "No changes detected"
+          else
+            echo "Changes detected, skipping"
+            exit 0
+          fi
+
+      - name: Auto approve
+        uses: hmarr/auto-approve-action@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Squash and merge
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              merge_method: 'squash'
+            })
