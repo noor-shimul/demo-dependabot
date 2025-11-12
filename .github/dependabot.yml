@@ -5,14 +5,8 @@ updates:
     schedule:
       interval: "daily"
     groups:
-      Providers-version-updates:
-        patterns:
+      patterns:
           - "*"
-    
-    commit-message:
-      prefix: "deps"
-      include: "scope"
-
     open-pull-requests-limit: 10
 
 
