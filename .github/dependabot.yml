@@ -6,7 +6,7 @@ updates:
       interval: "daily"
     groups:
       Proivers:
-      patterns:
+        patterns:
           - "*"
     open-pull-requests-limit: 10
 
