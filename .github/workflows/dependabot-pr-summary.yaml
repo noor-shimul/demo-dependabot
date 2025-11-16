@@ -1,0 +1,49 @@
+name: Dependabot PR Summary
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  dependabot-summary:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install GitHub CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gh jq
+
+      - name: Authenticate GitHub CLI
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+      - name: Generate Dependabot PR Summary
+        id: summary
+        run: |
+          echo "Fetching Dependabot PRs..."
+          summary="### Dependabot PR Summary\n\n"
+          prs=$(gh pr list --author dependabot[bot] --json number,title,url --jq '.[]')
+          if [ -z "$prs" ]; then
+            summary+="No Dependabot PRs found."
+          else
+            for pr in $(gh pr list --author dependabot[bot] --json number --jq '.[].number'); do
+              title=$(gh pr view $pr --json title --jq '.title')
+              url=$(gh pr view $pr --json url --jq '.url')
+              comments=$(gh pr view $pr --comments --json comments --jq '[.comments[] | select(.author.login=="dependabot[bot]")] | length')
+              summary+="- [#$pr]($url): **$title** | Dependabot comments: $comments\n"
+            done
+          fi
+          echo "$summary" > summary.md
+          echo "summary<<EOF" >> $GITHUB_OUTPUT
+          cat summary.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Post Summary as PR Comment
+        run: |
+          # Replace 123 with the PR number you want to comment on
+          gh pr comment 123 --body "$(cat summary.md)"
