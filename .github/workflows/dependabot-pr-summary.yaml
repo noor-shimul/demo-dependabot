@@ -43,7 +43,7 @@ jobs:
           cat summary.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Post Summary as PR Comment
-        run: |
-          # Replace 123 with the PR number you want to comment on
-          gh pr comment 50 --body "$(cat summary.md)"
+      # - name: Post Summary as PR Comment
+      #   run: |
+      #     # Replace 123 with the PR number you want to comment on
+      #     gh pr comment 50 --body "$(cat summary.md)"
