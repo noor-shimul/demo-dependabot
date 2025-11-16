@@ -1,0 +1,35 @@
+severity:
+- UNKNOWN
+- LOW
+- MEDIUM
+- HIGH
+- CRITICAL
+scanners:
+- vuln
+- misconfig
+- secret
+ignore-unfixed: false
+format: table
+exit-code: 1
+skip-dirs: []
+skip-files: []
+offline-scan: false
+security-checks:
+- vuln
+- config
+- secret
+trace: false
+debug: false
+quiet: false
+config-policy: ''
+config-data: ''
+file-patterns:
+  terraform:
+  - '*.tf'
+  yaml:
+  - '*.yaml'
+  - '*.yml'
+  json:
+  - '*.json'
+ignore-file: .trivyignore
+
