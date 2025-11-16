@@ -46,4 +46,4 @@ jobs:
       - name: Post Summary as PR Comment
         run: |
           # Replace 123 with the PR number you want to comment on
-          gh pr comment 123 --body "$(cat summary.md)"
+          gh pr comment 50 --body "$(cat summary.md)"
