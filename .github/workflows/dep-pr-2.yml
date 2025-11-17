@@ -1,0 +1,36 @@
+name: Dependabot PR Report 2
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  dependabot-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install GitHub CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gh jq
+
+      - name: Authenticate GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh auth setup-git
+          gh auth status
+
+      - name: List Dependabot PRs and Comments
+        run: |
+          echo "Fetching Dependabot PRs and comments..."
+          for pr in $(gh pr list --author dependabot[bot] --json number --jq '.[].number'); do
+            echo "----------------------------------------"
+            echo "PR #$pr"
+            gh pr view $pr --json title,url --jq '"Title: \(.title)\nURL: \(.url)"'
+            echo "Dependabot Comments:"
+            gh pr view $pr --comments --json comments | jq -r '.comments[] | select(.author.login=="dependabot[bot]") | "  - \(.body)"'
