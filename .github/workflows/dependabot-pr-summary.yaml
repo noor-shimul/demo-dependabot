@@ -22,28 +22,22 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
-      - name: Generate Dependabot PR Summary
-        id: summary
+
+      - name: Generate Dependabot PR Report
+        id: report
         run: |
-          echo "Fetching Dependabot PRs..."
-          summary="### Dependabot PR Summary\n\n"
-          prs=$(gh pr list --author dependabot[bot] --json number,title,url --jq '.[]')
-          if [ -z "$prs" ]; then
-            summary+="No Dependabot PRs found."
-          else
-            for pr in $(gh pr list --author dependabot[bot] --json number --jq '.[].number'); do
-              title=$(gh pr view $pr --json title --jq '.title')
-              url=$(gh pr view $pr --json url --jq '.url')
-              comments=$(gh pr view $pr --comments --json comments --jq '[.comments[] | select(.author.login=="dependabot[bot]")] | length')
-              summary+="- [#$pr]($url): **$title** | Dependabot comments: $comments\n"
-            done
-          fi
-          echo "$summary" > summary.md
-          echo "summary<<EOF" >> $GITHUB_OUTPUT
-          cat summary.md >> $GITHUB_OUTPUT
+          echo "report<<EOF" >> $GITHUB_OUTPUT
+          for pr in $(gh pr list --author dependabot[bot] --json number --jq '.[].number'); do
+            echo "### PR #$pr" >> $GITHUB_OUTPUT
+            gh pr view $pr --json title,url --jq '"- **Title:** \(.title)\n- **URL:** \(.url)"' >> $GITHUB_OUTPUT
+            echo "**Dependabot Comments:**" >> $GITHUB_OUTPUT
+            gh pr view $pr --comments --json comments | jq -r '.comments[] | select(.author.login=="dependabot[bot]") | "  - \(.body)"' >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+          done
           echo "EOF" >> $GITHUB_OUTPUT
 
-      # - name: Post Summary as PR Comment
-      #   run: |
-      #     # Replace 123 with the PR number you want to comment on
-      #     gh pr comment 50 --body "$(cat summary.md)"
+      - name: Post Report as PR Comment
+        if: ${{ steps.report.outputs.report != '' }}
+        run: |
+          # Post the report as a comment on a specific PR (e.g., the first Dependabot PR)
+          first_pr=$(gh pr list --author dependabot[bot] --json number --jq '.[0].number')
