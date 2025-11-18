@@ -1,4 +1,4 @@
-name: test-dependabot-Auto-approve Dependabot PRs if bot has no comments
+name: new-dependabot-Auto-approve Dependabot PRs if bot has no comments
 
 on:
   workflow_dispatch:
