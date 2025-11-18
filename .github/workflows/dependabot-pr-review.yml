@@ -10,6 +10,7 @@ on:
 
 jobs:
   auto-approve-dependabot:
+   # if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: write # Needed for gh pr merge
