@@ -61,10 +61,10 @@ jobs:
               echo "  This PR has 0 comments. Approving and enabling auto-merge."
 
               # Approve the PR
-              gh pr review $PR_NUM --approve -b "Automatically approved and merged because no comments were found (from bot or users)."
+              # gh pr review $PR_NUM --approve -b "Automatically approved and merged because no comments were found (from bot or users)."
 
               # Enable auto-merge (squash method used as example)
-              gh pr merge $PR_NUM --auto --squash || echo "  Warning: Could not enable auto-merge or merge PR #$PR_NUM. It might have conflicts or pending checks."
+              # gh pr merge $PR_NUM --auto --squash || echo "  Warning: Could not enable auto-merge or merge PR #$PR_NUM. It might have conflicts or pending checks."
               
               PROCESSED_PRS+=($PR_NUM)
 
