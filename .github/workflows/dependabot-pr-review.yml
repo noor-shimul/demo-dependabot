@@ -17,14 +17,18 @@ jobs:
       
     steps:
       - name: Checkout
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@v3
         env:
           token: ${{ env.ACCESS_TOKEN }}
         
       - name: Install GitHub CLI
-        uses: cli/cli-action@v2
-        with:
-          version: latest
+        run: |  
+          sudo apt-get update
+          sudo apt-get install -y gh jq
+
+      - name: Authenticate GitHub CLI
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
       - name: Process Dependabot PRs
         env:
