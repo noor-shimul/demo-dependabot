@@ -1,0 +1,67 @@
+name: Auto-approve Dependabot PRs if bot has no comments
+
+on:
+  workflow_dispatch:
+  # Optional: run on a schedule
+  # schedule:
+  #   - cron: '0 8 * * *'
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  auto-approve-dependabot:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed for gh pr merge
+      pull-requests: write # Needed for gh pr review
+
+    steps:
+      - name: Install GitHub CLI
+        uses: cli/cli-action@v2
+        with:
+          version: latest
+
+      - name: Process Dependabot PRs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO_OWNER=$(gh repo view --json owner -q '.owner.login')
+          REPO_NAME=$(gh repo view --json name -q '.name')
+          
+          echo "Searching for open Dependabot PRs in $REPO_OWNER/$REPO_NAME..."
+
+          # List all open PRs authored by dependabot[bot]
+          PR_NUMBERS=$(gh pr list --state open --search "author:app/dependabot" --json number -q '.[].number')
+
+          if [ -z "$PR_NUMBERS" ]; then
+            echo "No open Dependabot PRs found."
+            exit 0
+          fi
+
+          echo "Found Dependabot PR numbers: $PR_NUMBERS"
+
+          # Iterate over each PR number
+          for PR_NUM in $PR_NUMBERS; do
+            echo "--- Processing PR #$PR_NUM ---"
+
+            # Check for comments made specifically by dependabot[bot]
+            # Use 'gh api' to list issue comments and filter by the bot's login
+            BOT_COMMENTS=$(gh api /repos/$REPO_OWNER/$REPO_NAME/issues/$PR_NUM/comments \
+              --jq '.[] | select(.user.login == "dependabot[bot]") | .body')
+
+            if [ -z "$BOT_COMMENTS" ]; then
+              echo "  No comments found from dependabot[bot], all looks good. Approving PR."
+              
+              # Approve the PR
+              gh pr review $PR_NUM --approve -b "Automatically approving as Dependabot has made no comments."
+              
+              # Optional: Enable auto-merge
+              gh pr merge $PR_NUM --auto --squash || echo "  Could not enable auto-merge for PR #$PR_NUM (might require checks/manual intervention)."
+
+            else
+              echo "  Comments found from dependabot[bot]. Skipping automatic approval."
+              # Print the comments found for visibility
+              printf "%s\n" "$BOT_COMMENTS" | sed 's/^/    /'
+            fi
+            echo "----------------------------"
+          done
