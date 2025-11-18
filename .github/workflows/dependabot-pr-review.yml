@@ -14,8 +14,13 @@ jobs:
     permissions:
       contents: write # Needed for gh pr merge
       pull-requests: write # Needed for gh pr review
-
+      
     steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        env:
+          token: ${{ env.ACCESS_TOKEN }}
+        
       - name: Install GitHub CLI
         uses: cli/cli-action@v2
         with:
