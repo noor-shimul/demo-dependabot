@@ -33,13 +33,14 @@ jobs:
       - name: Process Dependabot PRs
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
         run: |
           REPO_OWNER=$(gh repo view --json owner -q '.owner.login')
           REPO_NAME=$(gh repo view --json name -q '.name')
-          
-          echo "Searching for open Dependabot PRs in $REPO_OWNER/$REPO_NAME..."
 
-          # List all open PRs authored by dependabot[bot]
+          echo "Searching for open Dependabot PRs in $REPO_OWNER/$REPO_NAME..."
+          echo "Filtering for PRs that have exactly zero comments total, then approving/merging..."
+
           PR_NUMBERS=$(gh pr list --state open --search "author:app/dependabot" --json number -q '.[].number')
 
           if [ -z "$PR_NUMBERS" ]; then
@@ -47,30 +48,34 @@ jobs:
             exit 0
           fi
 
-          echo "Found Dependabot PR numbers: $PR_NUMBERS"
+          PROCESSED_PRS=()
 
-          # Iterate over each PR number
           for PR_NUM in $PR_NUMBERS; do
-            echo "--- Processing PR #$PR_NUM ---"
+            # Fetch all comments for the PR and count the total number
+            COMMENTS_COUNT=$(gh api /repos/$REPO_OWNER/$REPO_NAME/issues/$PR_NUM/comments \
+              --jq 'length')
 
-            # Check for comments made specifically by dependabot[bot]
-            # Use 'gh api' to list issue comments and filter by the bot's login
-            BOT_COMMENTS=$(gh api /repos/$REPO_OWNER/$REPO_NAME/issues/$PR_NUM/comments \
-              --jq '.[] | select(.user.login == "dependabot[bot]") | .body')
+            if [ "$COMMENTS_COUNT" -eq 0 ]; then
+              PR_TITLE=$(gh pr view $PR_NUM --json title -q '.title')
+              echo "  --> Action on PR #$PR_NUM: $PR_TITLE"
+              echo "  This PR has 0 comments. Approving and enabling auto-merge."
 
-            if [ -z "$BOT_COMMENTS" ]; then
-              echo "  No comments found from dependabot[bot], all looks good. Approving PR."
-              
               # Approve the PR
-              gh pr review $PR_NUM --approve -b "Automatically approving as Dependabot has made no comments."
+              gh pr review $PR_NUM --approve -b "Automatically approved and merged because no comments were found (from bot or users)."
+
+              # Enable auto-merge (squash method used as example)
+              gh pr merge $PR_NUM --auto --squash || echo "  Warning: Could not enable auto-merge or merge PR #$PR_NUM. It might have conflicts or pending checks."
               
-              # Optional: Enable auto-merge
-              gh pr merge $PR_NUM --auto --squash || echo "  Could not enable auto-merge for PR #$PR_NUM (might require checks/manual intervention)."
+              PROCESSED_PRS+=($PR_NUM)
 
             else
-              echo "  Comments found from dependabot[bot]. Skipping automatic approval."
-              # Print the comments found for visibility
-              printf "%s\n" "$BOT_COMMENTS" | sed 's/^/    /'
+              echo "  [SKIPPED] PR #$PR_NUM has $COMMENTS_COUNT comments. No action taken."
             fi
-            echo "----------------------------"
           done
+
+          echo "----------------------------"
+          if [ ${#PROCESSED_PRS[@]} -eq 0 ]; then
+            echo "SUMMARY: No PRs were approved/merged."
+          else
+            echo "SUMMARY: Approved and set for auto-merge PRs: ${PROCESSED_PRS[@]}"
+          fi
