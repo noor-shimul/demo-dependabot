@@ -1,4 +1,4 @@
-name: noor-Auto Approve/Merge Zero Comment Dependabot PRs
+name: Noor-Auto Approve/Merge Zero Comment Dependabot PRs
 
 on:
   workflow_dispatch:
