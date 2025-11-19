@@ -10,6 +10,16 @@ updates:
           - "*"
     open-pull-requests-limit: 10
 
+  - package-ecosystem: "terraform"
+    directory: "/version3"
+    schedule:
+      interval: "daily"
+    groups:
+      Proivers:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 10
+
 
 
 #Current config
