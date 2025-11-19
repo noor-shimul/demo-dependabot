@@ -71,7 +71,7 @@ jobs:
             echo "  This PR has 0 comments and is not approved. Processing action."
 
             # 3. Add the specific comment
-            COMMENT_BODY="All looks good, approving this PR as there are no existing comments."
+            COMMENT_BODY="All looks good, approving this PR as there are no existing comments or resource changes."
             echo "  Adding comment: $COMMENT_BODY"
             gh pr comment $PR_NUM --body "$COMMENT_BODY"
             
