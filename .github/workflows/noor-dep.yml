@@ -82,7 +82,4 @@ jobs:
             # 5. Enable auto-merge
             echo "  Enabling auto-merge."
             # gh pr merge $PR_NUM --auto --squash || echo "  Warning: Could not enable auto-merge for PR #$PR_NUM."
-
           done
-
-
