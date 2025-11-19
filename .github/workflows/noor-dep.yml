@@ -1,0 +1,88 @@
+name: noor-Auto Approve/Merge Zero Comment Dependabot PRs
+
+on:
+  workflow_dispatch:
+  # Optional: can add a schedule here if preferred
+  # schedule:
+  #   - cron: '0 8 * * *'
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  approve-and-merge-prs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed for gh pr merge
+      pull-requests: write # Needed for gh pr review
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        env:
+          token: ${{ env.ACCESS_TOKEN }}
+
+      - name: Install GitHub CLI
+        run: |  
+          sudo apt-get update
+          sudo apt-get install -y gh jq
+      - name: Authenticate GitHub CLI
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          
+      - name: Process Dependabot PRs with no comments
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO_OWNER=$(gh repo view --json owner -q '.owner.login')
+          REPO_NAME=$(gh repo view --json name -q '.name')
+
+          echo "Searching for open Dependabot PRs that need action (0 comments, not yet approved)."
+
+          PR_NUMBERS=$(gh pr list --state open --search "author:app/dependabot" --json number -q '.[].number')
+
+          if [ -z "$PR_NUMBERS" ]; then
+            echo "No open Dependabot PRs found."
+            exit 0
+          fi
+
+          for PR_NUM in $PR_NUMBERS; do
+            PR_TITLE=$(gh pr view $PR_NUM --json title -q '.title')
+
+            # 1. Check if PR has zero total comments
+            COMMENTS_COUNT=$(gh api /repos/$REPO_OWNER/$REPO_NAME/issues/$PR_NUM/comments --jq 'length')
+
+            if [ "$COMMENTS_COUNT" -gt 0 ]; then
+              echo "  [SKIPPED] PR #$PR_NUM has existing comments ($COMMENTS_COUNT). No action taken."
+              continue # Skip the rest of the loop for this PR
+            fi
+
+            # 2. Check if the PR has already been approved by our bot/user
+            # We look for reviews submitted by the user account running this workflow (GITHUB_ACTOR)
+            IS_APPROVED=$(gh pr view $PR_NUM --json reviews --jq \
+              ".reviews[] | select(.author.login == \"$GITHUB_ACTOR\" and .state == \"APPROVED\") | .state")
+
+            if [ -n "$IS_APPROVED" ]; then
+              echo "  [SKIPPED] PR #$PR_NUM is already approved by $GITHUB_ACTOR. No action taken."
+              continue # Skip the rest of the loop for this PR
+            fi
+            
+            # If we reach this point, the PR has 0 comments and is not yet approved by us.
+            echo "  --> Action required for PR #$PR_NUM: $PR_TITLE"
+            echo "  This PR has 0 comments and is not approved. Processing action."
+
+            # 3. Add the specific comment
+            COMMENT_BODY="All looks good, approving this PR as there are no existing comments."
+            echo "  Adding comment: $COMMENT_BODY"
+            gh pr comment $PR_NUM --body "$COMMENT_BODY"
+            
+            # 4. Approve the PR
+            echo "  Approving the PR."
+            # gh pr review $PR_NUM --approve -b "Automatic approval."
+
+            # 5. Enable auto-merge
+            echo "  Enabling auto-merge."
+            # gh pr merge $PR_NUM --auto --squash || echo "  Warning: Could not enable auto-merge for PR #$PR_NUM."
+
+          done
+
+
