@@ -8,7 +8,7 @@ on:
     
 jobs:
   approve-and-merge-prs:
-    #if: ${{ github.actor == 'dependabot[bot]' }}
+    #if: ${{ github.actor == 'dependabot[bot]' }} #n
     runs-on: ubuntu-latest
     permissions:
       # Set workflow permissions to read-only as the PAT handles all write operations
