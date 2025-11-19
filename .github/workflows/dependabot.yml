@@ -1,0 +1,61 @@
+# Dependabot PRs Approve/Merge - PRs with Zero Comment and no changes
+name: new now Dependabot Approve/Merge PRs
+
+on:
+  # Allows manual triggering from the GitHub UI
+  workflow_dispatch:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  approve-and-merge-prs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed for 'gh pr merge' (auto-merge)
+      pull-requests: write # Needed for 'gh pr review --approve'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+          
+      - name: Process Dependabot PRs with no comments
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO_OWNER=$(gh repo view --json owner -q '.owner.login')
+          REPO_NAME=$(gh repo view --json name -q '.name')
+
+          echo "Searching for open Dependabot PRs in $REPO_OWNER/$REPO_NAME with 0 total comments."
+
+          # List all open PRs authored by dependabot[bot]
+          PR_NUMBERS=$(gh pr list --state open --search "author:app/dependabot" --json number -q '.[].number')
+
+          if [ -z "$PR_NUMBERS" ]; then
+            echo "No open Dependabot PRs found."
+            exit 0
+          fi
+
+          for PR_NUM in $PR_NUMBERS; do
+            # Fetch all comments for the PR and count the total number
+            COMMENTS_COUNT=$(gh api /repos/$REPO_OWNER/$REPO_NAME/issues/$PR_NUM/comments --jq 'length')
+
+            if [ "$COMMENTS_COUNT" -eq 0 ]; then
+              PR_TITLE=$(gh pr view $PR_NUM --json title -q '.title')
+              echo "  --> Found PR #$PR_NUM: $PR_TITLE"
+              echo "  This PR has 0 comments. Approving and enabling auto-merge."
+
+              # Approve the PR
+              gh pr review $PR_NUM --approve -b "Automatically approved and merged because no comments were found."
+
+              # Enable auto-merge
+              # This sets it to merge when all status checks pass (e.g., CI builds)
+              gh pr merge $PR_NUM --auto --squash || echo "  Warning: Could not enable auto-merge for PR #$PR_NUM."
+              
+              # Exit the loop after finding the first one (as the request implied finding "a" PR)
+              # Remove 'break' if you want to process ALL matching PRs
+              
+
+            else
+              echo "  [SKIPPED] PR #$PR_NUM has $COMMENTS_COUNT comments."
+            fi
+          done
