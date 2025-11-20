@@ -8,7 +8,7 @@ on:
     
 jobs:
   approve-and-merge-prs:
-    #if: ${{ github.actor == 'dependabot[bot]' }} #n
+    #if: ${{ github.actor == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     permissions:
       # Set workflow permissions to read-only as the PAT handles all write operations
@@ -26,6 +26,8 @@ jobs:
           GH_TOKEN: ${{ secrets.NS_PAT }}
           PAT_ACTOR: ${{ secrets.NS_PAT }}
         run: |
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO_OWNER=$(gh repo view --json owner -q '.owner.login')
           REPO_NAME=$(gh repo view --json name -q '.name')
 
