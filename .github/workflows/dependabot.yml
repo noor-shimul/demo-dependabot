@@ -8,7 +8,7 @@ on:
     
 jobs:
   approve-and-merge-prs:
-    #if: ${{ github.actor == 'dependabot[bot]' }}
+    if: ${{ github.actor == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     permissions:
       # Set workflow permissions to read-only as the PAT handles all write operations
@@ -68,7 +68,11 @@ jobs:
             # 3. Approve the PR
             echo "  Approving the PR."
             gh pr review $PR_NUM --approve -b "All looks good, Auto approving."
-
+            
+            # Delay for GitHub systems to register the approval
+            echo "  Waiting 5 seconds for GitHub to register the approval..."
+            sleep 5
+            
             # 4. Enable auto-merge
             echo "  Enabling auto-merge."
             gh pr merge $PR_NUM --auto --squash || echo "  Warning: Could not enable auto-merge for PR #$PR_NUM."
