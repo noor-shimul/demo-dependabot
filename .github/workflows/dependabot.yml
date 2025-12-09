@@ -5,7 +5,12 @@ on:
   workflow_dispatch:
   pull_request_target:
     types: [opened, reopened, ready_for_review]
-    
+    branches: [main]
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_TOKEN: ${{ secrets.NS_PAT }}
+  PAT_ACTOR: ${{ secrets.NS_PAT }}
+  
 jobs:
   approve-and-merge-prs:
     if: ${{ github.actor == 'dependabot[bot]' }}
@@ -14,20 +19,15 @@ jobs:
       # Set workflow permissions to read-only as the PAT handles all write operations
       # We still need read for checkout and basic metadata access.
       contents: read
-      pull-requests: read
-      issues: read
+      pull-requests: write
+      issues: write
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Find and Process Dependabot PRs with no comments
-        env:
-          GH_TOKEN: ${{ secrets.NS_PAT }}
-          PAT_ACTOR: ${{ secrets.NS_PAT }}
         run: |
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO_OWNER=$(gh repo view --json owner -q '.owner.login')
           REPO_NAME=$(gh repo view --json name -q '.name')
 
