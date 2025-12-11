@@ -1,13 +1,11 @@
 # GitHub Actions Workflow to Auto Approve & Merge Dependabot PRs with 0 Comments or Changes
-name: Auto Approve & Merge Dependabot PRs
-
+name: Process Dependabot PRs
 on:
   workflow_dispatch:
-  pull_request_target:
+  pull_request:
     types: [opened, reopened, ready_for_review]
     branches: ["main"]
 env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GH_TOKEN: ${{ secrets.NS_PAT }}
   PAT_ACTOR: ${{ secrets.NS_PAT }}
   
@@ -15,17 +13,9 @@ jobs:
   approve-and-merge-prs:
     if: ${{ github.actor == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
-    permissions:
-      # Set workflow permissions to read-only as the PAT handles all write operations
-      # We still need read for checkout and basic metadata access.
-      contents: read
-      pull-requests: write
-      issues: write
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-
       - name: Find and Process Dependabot PRs with no comments
         run: |
           REPO_OWNER=$(gh repo view --json owner -q '.owner.login')
