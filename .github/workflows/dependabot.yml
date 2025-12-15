@@ -2,7 +2,8 @@
 name: Process Dependabot PRs
 on:
   workflow_dispatch:
-  pull_request:
+#  pull_request:
+  pull_request_target:  # Resource not accessible by integration. In some cases, the GitHub token used for actions triggered from `pull_request` events are read-only, which can cause this problem. Switching to the `pull_request_target` event typically resolves this issue.
     types: [opened, reopened, ready_for_review]
     branches: ["main"]
 env:
